@@ -1,0 +1,53 @@
+{
+    "[html]": {
+        "editor.formatOnSave": false
+    },
+    "[python]": {
+        "editor.formatOnSave": true
+    },
+    "python.formatting.provider": "black",
+    "python.sortImports.args": ["--profile", "black"],
+    "python.formatting.blackArgs": [],
+    "mypy-type-checker.args": [
+        "--ignore-missing-imports",
+        "--strict-optional",
+        "--warn-unused-ignores",
+        "--warn-redundant-casts",
+        "--warn-unused-configs"
+    ],
+    "mypy-type-checker.ignorePatterns": [
+        "static*",
+        "templates",
+        "tests",
+        "plugins"
+    ],
+    "mypy-type-checker.path": [
+        "[~/.cache/pypoetry/virtualenvs/automation-mOHJkXBG-py3.12/bin/mypy]"
+    ],
+    "pylint.interpreter": [
+        "~/.cache/pypoetry/virtualenvs/automation-mOHJkXBG-py3.12/bin/pylint"
+    ],
+    "pylint.args": [
+        "--max-line-length=110"
+    ],
+    "isort.path": [
+        "~/.cache/pypoetry/virtualenvs/automation-mOHJkXBG-py3.12/bin/isort"
+    ],
+    "isort.args": [
+        "--profile",
+        "black",
+        "--multi-line",
+        "3",
+        "--include-trailing-comma",
+        "--force-grid-wrap",
+        "0",
+        "--use-parentheses",
+        "--ensure-newline-before-comments",
+        "--line-length",
+        "110"
+    ],
+    "python.pythonPath": "~/.cache/pypoetry/virtualenvs/automation-mOHJkXBG-py3.12/bin/python",
+    "flake8.args": [
+        "--max-line-length=110"
+    ],
+}
