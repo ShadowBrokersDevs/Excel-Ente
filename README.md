@@ -14,6 +14,45 @@ Esta utilidad es crucial para que el equipo de negocio realice análisis de dato
 2. Instala las dependencias requeridas.
 3. Configura la base de datos.
 
+
+```bash
+# Clona el repositorio
+git clone https://github.com/ShadowBrokersDevs/Excel-Ente.git
+
+# Instala paquetes necesarios
+sudo apt-get install libmemcached-dev
+
+# Navega al directorio del proyecto
+cd Excel-Ente
+
+# Crea un entorno virtual e instala
+poetry install
+
+# Realiza las migraciones
+poetry run python manage.py migrate
+
+# Recopila los archivos estáticos
+poetry run python manage.py collectstatic
+
+# Inicia el servidor de desarrollo
+poetry run python manage.py runserver
+```
+
+## Ejecutar tests
+
+Para ejecutar los tests, usa el siguiente comando:
+
+```bash
+python manage.py test
+```
+
+Para obtener un informe de cobertura, instala `coverage` y ejecuta:
+
+```bash
+coverage run manage.py test
+coverage report
+```
+
 ## Uso
 - Accede a la aplicación y carga tus archivos.
 - Realiza consultas y transformaciones de datos.
@@ -21,4 +60,3 @@ Esta utilidad es crucial para que el equipo de negocio realice análisis de dato
 
 ## Contribuciones
 Las contribuciones son bienvenidas. Por favor, abre un issue o un pull request para discutir cambios.
-

@@ -1,0 +1,52 @@
+{% extends "data_manager/base.html" %}
+
+{% block title %}Previsualización de Datos{% endblock %}
+
+{% block content %}
+<div class="bg-gray-800 rounded-lg shadow-md p-6">
+    <h2 class="text-xl font-semibold mb-4">Previsualización de Datos</h2>
+
+    {% if saved %}
+        <div class="bg-green-500 text-white p-4 rounded-md mb-4">
+            Los datos se han guardado exitosamente.
+        </div>
+    {% endif %}
+
+    <h3 class="text-lg font-semibold">Base de Datos: {{ db_name }}</h3>  <!-- Mover aquí para que siempre se muestre -->
+
+    {% if not saved %}
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                Guardar
+            </button>
+        </form>
+        <h3 class="text-lg font-semibold">Previsualización de Datos:</h3>
+        <div id="tab-content">
+            {% for table_name, table_html in html_dataframes.items %}
+                <div id="{{ table_name }}" class="table-content hidden">
+                    {{ table_html|safe }}
+                </div>
+                <button class="tab-button" onclick="showTable(event, '{{ table_name }}')">{{ table_name }}</button>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function showTable(event, tableName) {
+    document.querySelectorAll('.table-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('bg-blue-600', 'text-white'));
+
+    document.getElementById(tableName).classList.remove('hidden');
+    event.currentTarget.classList.add('bg-blue-600', 'text-white');
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const firstTab = document.querySelector('.tab-button');
+    if (firstTab) {
+        firstTab.click();
+    }
+});
+</script>
+{% endblock %}

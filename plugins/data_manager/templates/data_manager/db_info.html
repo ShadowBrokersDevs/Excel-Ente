@@ -1,0 +1,32 @@
+{% extends "data_manager/base.html" %}
+
+{% block content %}
+<h1>Información de la Base de Datos</h1>
+<p><strong>Nombre:</strong> {{ db_name }}</p>
+<p><strong>Fecha de Creación:</strong> {{ creation_time|date:"Y-m-d H:i:s" }}</p>
+<p><strong>Fecha de Última Modificación:</strong> {{ modification_time|date:"Y-m-d H:i:s" }}</p>
+
+<h2>Tablas</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre de la Tabla</th>
+            <th>Detalles</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for table_name, details in table_details.items %}
+        <tr>
+            <td>{{ table_name }}</td>
+            <td>
+                <ul>
+                    {% for detail in details %}
+                    <li>{{ detail }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

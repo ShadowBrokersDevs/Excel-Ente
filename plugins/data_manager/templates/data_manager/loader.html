@@ -1,0 +1,19 @@
+{% extends "data_manager/base.html" %}
+
+{% block title %}Cargar Archivo{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-gray-800 rounded-lg shadow-md p-6">
+    <h2 class="text-xl font-semibold mb-4">Cargar Archivo</h2>
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        <div>
+            <label for="{{ form.file.id_for_label }}" class="block mb-2">Seleccionar archivo:</label>
+            {{ form.file }}
+        </div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Cargar
+        </button>
+    </form>
+</div>
+{% endblock %}
