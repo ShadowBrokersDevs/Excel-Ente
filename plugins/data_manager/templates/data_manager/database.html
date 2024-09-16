@@ -3,45 +3,61 @@
 {% block title %}Base de Datos: {{ db_name }}{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-gray-800 rounded-lg shadow-md p-6">
-    <h2 class="text-xl font-semibold mb-4">Base de Datos: {{ db_name }}</h2>
-    <h3 class="text-lg font-semibold mb-2">Tablas:</h3>
-    <ul>
-        {% for table in tables %}
-            <li>{{ table }}</li>
-            <pre>{{ table_info.table }}</pre>
-        {% endfor %}
-    </ul>
-    <form id="rename-form" method="post" action="{% url 'data_manager:rename_database' %}">
-        {% csrf_token %}
-        <input type="hidden" name="db_name" value="{{ db_name }}">
-        <label for="new_db_name" class="block text-white">Nuevo nombre de la base de datos:</label>
-        <input type="text" name="new_db_name" id="new_db_name" class="block w-full mb-4 p-2 rounded" required>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Renombrar Base de Datos
-        </button>
-    </form>
-    <table>
+<div class="max-w-full mx-auto bg-gray-800 rounded-lg shadow-md p-6">
+    <table class="w-full text-center">
         <thead>
             <tr>
-                <th>Nombre de la base de datos</th>
-                <th>Última edición</th>
-                <th>Acciones</th>
+                <th class="px-4 py-2">Id</th>
+                <th class="px-4 py-2">Nombre de la base de datos</th>
+                <th class="px-4 py-2">Última edición</th>
+                <th class="px-4 py-2">Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for user_file in user_files %}
             <tr>
-                <td>{{ user_file.db_file }}</td>
-                <td>{{ user_file.updated_at|date:"Y-m-d H:i:s" }}</td>  <!-- Asumiendo que hay un campo updated_at -->
-                <td>
-                    <a href="{% url 'data_manager:rename_database' %}" class="edit-icon">✏️</a>
-                    <a href="{% url 'data_manager:delete_database' user_file.id %}" class="delete-icon">🗑️</a>
-                    <a href="{% url 'data_manager:info_database' user_file.id %}" class="info-icon">ℹ️</a>
+                <td class="px-4 py-2">{{ user_file.id }}</td>
+                <td class="px-4 py-2">{{ user_file.db_file }}</td>
+                <td class="px-4 py-2">{{ user_file.edition_datetime|date:"Y-m-d H:i:s" }}</td>
+                <td class="px-4 py-2">
+                    <a href="#" class="edit-icon" onclick="openRenameModal('{{ user_file.db_file }}')">✏️</a>
+                    <a href="#" class="delete-icon" onclick="openDeleteModal('{{ user_file.id }}')">🗑️</a>
+                    <a href="#" class="info-icon" onclick="openInfoModal('{{ user_file.id }}')">ℹ️</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
+<div id="rename-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close" onclick="closeRenameModal()">&times;</span>
+        <h2>Renombrar Base de Datos</h2>
+        <form id="rename-form" method="post" action="{% url 'data_manager:rename_database' %}">
+            {% csrf_token %}
+            <label for="db_name">Base de datos actual: <span id="current_db_name"></span></label>
+            <input type="hidden" name="db_name" value=""><br>
+            <input type="hidden" name="id" value=""><br>
+            <label for="new_db_name">Nuevo nombre: </label><br>
+            <input type="text" name="new_db_name" id="new_db_name" required><br>
+            <button type="submit"> Renombrar</button>
+        </form>
+    </div>
+</div>
+<div id="delete-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h2>Advertencia</h2>
+        <p>¿Estás seguro de que deseas eliminar esta base de datos? Esta acción no se puede deshacer.</p>
+        <button id="confirm-delete" class="bg-red-600 text-white">Eliminar Definitivamente</button>
+        <button onclick="closeDeleteModal()">Cancelar</button>
+    </div>
+</div>
+<div id="info-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close" onclick="closeInfoModal()">&times;</span>
+        <h2>Información de la Base de Datos</h2>
+        <div id="info-content"></div>
+    </div>
 </div>
 {% endblock %}

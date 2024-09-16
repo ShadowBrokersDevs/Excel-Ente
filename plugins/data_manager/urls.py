@@ -16,7 +16,7 @@ urlpatterns = [
     path("preview/<str:db_name>/", preview, name="preview"),
     path("database/", database_view, name="database"),
     path("database/edit/", database_edit_view, name="database_edit"),
-    path("database/rename/", rename_database_view, name="rename_database"),  # Ruta para renombrar
-    path("database/delete/<int:id>/", delete_database_view, name="delete_database"),  # Ruta para eliminar
+    path("database/rename/", rename_database_view, name="rename_database"),
+    path("database/delete/<int:id>/", delete_database_view, name="delete_database"),
     path("database/info/<int:id>/", db_info_view, name="info_database"),
 ]

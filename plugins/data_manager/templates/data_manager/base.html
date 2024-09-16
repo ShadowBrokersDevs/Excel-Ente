@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-gray-900">
 <head>
@@ -5,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Data Manager{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'data_manager/js/modals.js' %}"></script>
 </head>
 <body class="h-full flex flex-col text-gray-300">
     <header class="bg-blue-900 p-4">
@@ -16,10 +18,10 @@
             <!-- Contenido del sidebar -->
             <nav>
                 <ul>
+                    <li><a href="{% url 'data_manager:database' %}" class="block py-2 hover:text-white">Base de Datos</a></li>
                     <li><a href="{% url 'data_manager:loader' %}" class="block py-2 hover:text-white">Cargar Archivo</a></li>
                     {% if db_name %}
                         <li><a href="{% url 'data_manager:preview' db_name=db_name %}" class="block py-2 hover:text-white">Ver Previsualización</a></li>
-                        <li><a href="{% url 'data_manager:database' %}" class="block py-2 hover:text-white">Base de Datos</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -33,5 +35,6 @@
     <footer class="bg-blue-900 p-4 text-center">
         <p>&copy; 2024 Data Manager. Todos los derechos reservados.</p>
     </footer>
+
 </body>
 </html>

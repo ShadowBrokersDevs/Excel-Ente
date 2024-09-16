@@ -11,6 +11,7 @@ import re
 from django.utils.text import slugify
 import unidecode
 from .models import UserFile
+from django.http import HttpResponseForbidden
 
 # Configuración del logger
 logger = logging.getLogger(__name__)
@@ -74,8 +75,10 @@ def loader(request):
 
 @login_required
 def preview(request, db_name):
+    user_alias = request.user.username
+    json_file = f"{user_alias}_{db_name}.json"
+    json_path = f"{settings.SESSION_FILE_PATH}/{json_file}"
     if request.method == "POST":
-        user_alias = request.user.username
         db_file = f"{user_alias}_{db_name}.sqlite3"
 
         # Asegurarse de que la tabla UserFile existe antes de usarla
@@ -94,9 +97,9 @@ def preview(request, db_name):
         cursor = conn.cursor()
 
         # Cargar datos desde el archivo
-        with open(f"{settings.SESSION_FILE_PATH}/{user_alias}_{db_name}.json", "r") as f:
+        with open(json_path, "r") as f:
             uploaded_data = json.load(f)
-            logger.info(f"Datos recuperados de: {settings.SESSION_FILE_PATH}/{user_alias}_{db_name}.json")
+            logger.info(f"Datos recuperados de: {json_path}")
 
         for table_name, records in uploaded_data.items():
             table_name = sanitize_name(table_name)
@@ -131,9 +134,25 @@ def preview(request, db_name):
         conn.commit()
         conn.close()
         logger.info(f"Base de datos guardada en: {db_file}")
-        return redirect("data_manager:preview", db_name=db_name)
+        if os.path.exists(json_path):
+            os.remove(json_path)
+            logger.info(f"Archivo JSON eliminado: {json_path}")
+        return render(
+            request,
+            "data_manager/preview.html",
+            {
+                "html_dataframes": {},
+                "saved": True,
+                "db_name": db_name,
+            },
+        )
     else:
-        with open(f"{settings.SESSION_FILE_PATH}/{db_name}.json", "r") as f:
+        if os.path.exists(json_path):
+            logger.info(f"Archivo JSON encontrado: {json_path}")
+        else:
+            logger.warning(f"Archivo JSON no encontrado: {json_path}")
+            return redirect("data_manager:database")
+        with open(json_path, "r") as f:
             uploaded_data = json.load(f)
 
         html_dataframes = {
@@ -173,7 +192,7 @@ def database_view(request):
 @login_required
 def database_edit_view(request):
     if request.method == "POST":
-        db_name = request.POST.get("db_name")
+        _ = request.POST.get("db_name")
         # Aquí puedes manejar la lógica para editar la base de datos
         # Procesar SQL desde el formulario
         return redirect("data_manager:database")
@@ -182,18 +201,20 @@ def database_edit_view(request):
 @login_required
 def rename_database_view(request):
     if request.method == "POST":
-        old_db_name = request.POST.get("db_name")
+        old_db_file = request.POST.get("db_name")
         new_db_name = request.POST.get("new_db_name")
         user_alias = request.user.username
 
-        old_db_file = f"{user_alias}_{old_db_name}.sqlite3"
         new_db_file = f"{user_alias}_{new_db_name}.sqlite3"
+        user_file = UserFile.objects.get(db_file=old_db_file, user=user_alias)
+        if not user_file:
+            return HttpResponseForbidden("No tienes permiso para renombrar esta base de datos.")
 
-        # Renombrar el archivo de la base de datos
         os.rename(old_db_file, new_db_file)
-        UserFile.objects.filter(db_file=old_db_file).update(db_file=new_db_file)
-        logger.info(f"Base de datos renombrada de {old_db_name} a {new_db_name}")
-        return redirect("data_manager:database", db_name=new_db_name)
+        user_file.db_file = new_db_file
+        user_file.save()
+        logger.info(f"Base de datos renombrada de {old_db_file} a {new_db_file}")
+        return redirect("data_manager:database")
     else:
         return redirect("data_manager:database")
 
@@ -217,9 +238,9 @@ def db_info_view(request, id):
     user_file = UserFile.objects.get(id=id, user=user_alias)
 
     # Obtener información de la base de datos
-    db_file_path = f"{user_file.db_file}"
-    creation_time = os.path.getctime(db_file_path)
-    modification_time = os.path.getmtime(db_file_path)
+    db_file_path = user_file.db_file
+    creation_time = user_file.creation_datetime
+    modification_time = user_file.edition_datetime
 
     # Obtener detalles de las tablas
     conn = sqlite3.connect(db_file_path)
